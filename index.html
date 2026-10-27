@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Point / Counterpoint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: a debate judge's ballot — header strip, the motion, the opponent's point on a podium card, four rebuttal slips, judge's notes. */
+:root {
+  --paper: #f6f4ef; --card: #ffffff; --ink: #1b2233; --muted: #4d5566; --rule: #8a90a0;
+  --accent: #b3122a; --accent-ink: #ffffff; --good: #1d6b3a; --good-bg: #e6f2ea; --bad: #9b1b1b; --bad-bg: #f9e7e7; --focus: #1f4fd1; --hi: #fff1c9;
+  --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif; --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #141822; --card: #1d2230; --ink: #eceef3; --muted: #b5bccb; --rule: #6f7890;
+  --accent: #ff6b7d; --accent-ink: #1b0a0e; --good: #7fd9a0; --good-bg: #183324; --bad: #ff9a9a; --bad-bg: #3a1c20; --focus: #8fb3ff; --hi: #3d3520; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #141822; --card: #1d2230; --ink: #eceef3; --muted: #b5bccb; --rule: #6f7890;
+  --accent: #ff6b7d; --accent-ink: #1b0a0e; --good: #7fd9a0; --good-bg: #183324; --bad: #ff9a9a; --bad-bg: #3a1c20; --focus: #8fb3ff; --hi: #3d3520; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: 0.01em; line-height: 1.1; text-wrap: balance; margin: 0 }
+h1 { font-size: 2.6rem; text-transform: uppercase }
+h2 { font-size: 1.7rem } h3 { font-size: 1.35rem }
+.ballot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--rule); padding-block: 8px; font-family: var(--display); font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-variant-numeric: tabular-nums }
+p { margin: 0 } .muted { color: var(--muted) }
+.motion { font-family: var(--display); font-size: 1.25rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent) }
+.point { background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 16px 18px; display: grid; gap: 6px }
+.point .who { font-family: var(--display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted) }
+.point blockquote { margin: 0; font-size: 1.15rem; font-weight: 600 }
+.slips { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0 }
+button { font: inherit; color: inherit; cursor: pointer }
+.slip { width: 100%; min-height: 48px; text-align: left; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; display: grid; grid-template-columns: 2rem 1fr; gap: 10px; align-items: start; transition: transform .12s }
+.slip:hover:not(:disabled) { transform: translateX(3px); border-color: var(--ink) }
+.slip .k { font-family: var(--display); font-size: 1.3rem; color: var(--accent); font-weight: 700 }
+.slip:disabled { cursor: default }
+.slip.right { background: var(--good-bg); border-color: var(--good) }
+.slip.wrong { background: var(--bad-bg); border-color: var(--bad) }
+.tag { display: block; margin-top: 6px; font-size: .92rem; font-weight: 600 }
+.tag.good { color: var(--good) } .tag.bad { color: var(--bad) }
+.why { display: block; margin-top: 2px; font-size: .95rem; color: var(--muted) }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px }
+h2:focus, h3:focus { outline: none } h2:focus-visible, h3:focus-visible { outline: 3px solid var(--focus) }
+.feedback { border-left: 0; background: var(--hi); border-radius: 4px; padding: 14px 16px; display: grid; gap: 8px }
+.btn { min-height: 48px; padding: 10px 20px; border-radius: 4px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); font-family: var(--display); font-size: 1.2rem; text-transform: uppercase; letter-spacing: .06em; justify-self: start }
+.btn.ghost { background: transparent; color: var(--ink) }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
+.kbd { font-size: .9rem; color: var(--muted) }
+.table-wrap { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums }
+caption { text-align: left; font-family: var(--display); font-size: 1.15rem; text-transform: uppercase; letter-spacing: .05em; padding-bottom: 6px }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule) }
+thead th { border-bottom: 2px solid var(--ink) }
+.big { font-family: var(--display); font-size: 3.4rem; line-height: 1; color: var(--accent) }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+ul.plain { margin: 0; padding-left: 20px; display: grid; gap: 6px }
+@media (prefers-reduced-motion: reduce) { .slip { transition: none } .slip:hover:not(:disabled) { transform: none } }
+</style>
+</head>
+<body>
+
+<main class="wrap" id="app">
+  <section id="start" aria-labelledby="t-start">
+    <div style="display:grid;gap:14px">
+      <p class="ballot"><span>Module 11 · Debate practice</span><span>Ballot of 8 rounds</span></p>
+      <h1 id="t-start" tabindex="-1">Point / Counterpoint</h1>
+      <p>Each round shows a debate motion and one argument from the other side. Pick the <strong>strongest rebuttal</strong> of four. The other three each have a flaw debaters learn to spot: a straw man, a personal attack, a bandwagon appeal, a slippery slope, an off-topic jab, an unsupported claim, or a hasty generalization.</p>
+      <ul class="plain">
+        <li>8 rounds, 2 from each sector: media, business, education, and government.</li>
+        <li>Every round uses a real Module 11 case or statistic.</li>
+        <li>No timer. Keyboard: press 1–4 to choose, N for the next round.</li>
+      </ul>
+      <p class="muted" id="best-start"></p>
+      <button class="btn" id="go" type="button">Start the debate</button>
+    </div>
+  </section>
+
+  <section id="round" hidden aria-labelledby="t-round">
+    <div style="display:grid;gap:14px">
+      <p class="ballot"><span id="r-count">Round 1 of 8</span><span id="r-score">Score 0</span></p>
+      <h2 id="t-round" tabindex="-1">Round 1: Media</h2>
+      <p class="motion" id="r-motion"></p>
+      <div class="point"><span class="who" id="r-who"></span><blockquote id="r-point"></blockquote></div>
+      <p class="muted">Which counterpoint answers this best?</p>
+      <ol class="slips" id="r-opts"></ol>
+      <div class="feedback" id="fb" hidden>
+        <h3 id="t-fb" tabindex="-1"></h3>
+        <p id="fb-text"></p>
+        <div class="row"><button class="btn" id="next" type="button">Next round</button><span class="kbd">or press N</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="results" hidden aria-labelledby="t-res">
+    <div style="display:grid;gap:16px">
+      <p class="ballot"><span>Judge's decision</span><span id="res-best"></span></p>
+      <h2 id="t-res" tabindex="-1">Your ballot</h2>
+      <p><span class="big" id="res-score">0/8</span></p>
+      <div class="table-wrap"><table>
+        <caption>Results by sector</caption>
+        <thead><tr><th scope="col">Sector</th><th scope="col">Correct</th></tr></thead>
+        <tbody id="res-rows"></tbody>
+      </table></div>
+      <div class="feedback"><h3>What to work on</h3><p id="res-tip"></p><p id="res-trap"></p></div>
+      <div class="row"><button class="btn" id="again" type="button">Play again</button></div>
+    </div>
+  </section>
+  <p class="sr" aria-live="polite" id="live"></p>
+</main>
+
+<script>
+const FLAW = {
+  straw: ["Straw man", "It twists the other side into a weaker, sillier claim instead of answering what they said."],
+  personal: ["Personal attack", "It attacks the people making the argument, not the argument itself."],
+  bandwagon: ["Bandwagon", "It treats popularity, or what \"everyone\" does or feels, as proof."],
+  slope: ["Slippery slope", "It predicts an extreme chain of events with no evidence that one step leads to the next."],
+  offtopic: ["Off topic", "It changes the subject instead of answering the point."],
+  unsupported: ["Unsupported claim", "It asserts something big with no evidence behind it."],
+  hasty: ["Hasty generalization", "It turns one personal experience into a rule about everything."],
+};
+// Bank: 4 rounds per sector. The first option is always the strongest rebuttal; options are shuffled for display.
+const BANK = [
+ { s: "Media", motion: "News organizations should be allowed to publish AI-written articles if they label them.", who: "Their point (for the motion)", point: "Labeling solves the trust problem. If readers know a story is AI-written, they can decide how much to trust it.",
+   opts: [["A label tells readers who wrote a story, not whether it's true. The Sun-Times reading list would still have been wrong with a label on it; only a human check catches invented facts before they print.", "strong"], ["So you're saying newspapers should fire every journalist and let robots run the news?", "straw"], ["Most readers I know don't like AI news, so it should be banned.", "bandwagon"], ["AI also uses a lot of electricity, which is bad for the environment.", "offtopic"]] },
+ { s: "Media", motion: "News organizations should be allowed to publish AI-written articles if they label them.", who: "Their point (against the motion)", point: "AI-written news should be banned because AI makes mistakes.",
+   opts: [["Human reporters make mistakes too, and the fix is the same for both: editing and corrections. A ban would also block low-risk uses like transcribing interviews or translating stories.", "strong"], ["People who want to ban AI just don't understand technology.", "personal"], ["If we ban AI in news, next we'll ban spell-check and calculators.", "slope"], ["AI improves every month, so soon it won't make any mistakes at all.", "unsupported"]] },
+ { s: "Media", motion: "Newsrooms should use AI to write short summaries of their stories.", who: "Their point (for the motion)", point: "Summaries save readers time, and young people already get news this way: 17% of 18–24-year-olds use AI chatbots for news every week.",
+   opts: [["Reaching young readers matters, but only 20% of people trust news from chatbots. A summary that drops key context could lower that trust further, so summaries need an editor's check and a link to the full story.", "strong"], ["My cousin read an AI summary once and it was wrong, so all AI summaries are wrong.", "hasty"], ["You want to replace newspapers with three-sentence summaries.", "straw"], ["Young people should be reading more books instead of the news anyway.", "offtopic"]] },
+ { s: "Media", motion: "A TV station should be allowed to use an AI clone of its anchor's voice for late-night updates.", who: "Their point (against the motion)", point: "A cloned voice could be stolen and used to make fake news clips.",
+   opts: [["That's a real risk, but it has known fixes: consent the anchor can revoke, secure storage that's deleted when the contract ends, and a clear \"AI voice\" label. Those address the risk without banning the tool.", "strong"], ["Anchors who complain about this just want more money.", "personal"], ["Nobody would ever bother stealing a local anchor's voice.", "unsupported"], ["If we don't allow this, the station will be out of business by next year.", "slope"]] },
+ { s: "Business", motion: "Companies should be allowed to replace human customer service with AI chatbots.", who: "Their point (for the motion)", point: "Chatbots answer instantly, 24/7, in dozens of languages. Klarna said its assistant handled two-thirds of customer chats in its first month.",
+   opts: [["Speed isn't the same as good service. Klarna's own CEO later said the push went too far and quality dropped, and the company started hiring people again. Customers still need a way to reach a person.", "strong"], ["Klarna's CEO is a rich guy who doesn't care about workers.", "personal"], ["So you think it's fine for companies to never answer the phone at all.", "straw"], ["Everybody hates chatbots.", "bandwagon"]] },
+ { s: "Business", motion: "Companies should be allowed to replace human customer service with AI chatbots.", who: "Their point (against the motion)", point: "Chatbots give wrong answers, so companies shouldn't use them.",
+   opts: [["Wrong answers are a real risk; Air Canada had to pay for one. But the tribunal's message was that companies own what their chatbot says. That pushes companies to ground bots in their real policies and add human backup, not to give up the tool.", "strong"], ["If we stop using chatbots, we'll have to stop using websites too.", "slope"], ["Human call-center agents are rude all the time.", "offtopic"], ["The newest chatbots never make mistakes.", "unsupported"]] },
+ { s: "Business", motion: "Banks should use AI to screen loan applications.", who: "Their point (for the motion)", point: "AI is more objective than human loan officers because it doesn't have feelings.",
+   opts: [["No feelings doesn't mean no bias. A model learns from past lending decisions, so it can repeat old unfairness at scale. That's why the EU AI Act treats credit-scoring AI as high-risk and requires testing.", "strong"], ["Bankers only care about profit, so nothing they say counts.", "personal"], ["You're claiming computers should never be used in banking.", "straw"], ["I got rejected for a credit card once, so these systems don't work.", "hasty"]] },
+ { s: "Business", motion: "Businesses should use AI to write their marketing content.", who: "Their point (against the motion)", point: "AI marketing copy all sounds the same. It will make every brand sound generic.",
+   opts: [["Generic copy is an editing problem, not a reason to drop the tool. The AI Index reports marketing teams saw productivity gains of up to 72%; a human editor who adds the brand's voice keeps the speed without the sameness.", "strong"], ["All the big companies use it, so it must be good.", "bandwagon"], ["Copywriters only say that because they're afraid of losing their jobs.", "personal"], ["Ads are annoying anyway.", "offtopic"]] },
+ { s: "Education", motion: "Colleges should use AI detectors to enforce academic integrity.", who: "Their point (for the motion)", point: "Detectors are objective. They give a number, so there's no teacher bias.",
+   opts: [["A number can still be biased. In a 2023 Stanford study, seven detectors flagged essays by non-native English writers as AI-written 61% of the time on average. A score should start a conversation, not end one.", "strong"], ["Teachers who use detectors are just lazy.", "personal"], ["So you want colleges to let everyone cheat.", "straw"], ["Detectors will be perfect in a year or two anyway.", "unsupported"]] },
+ { s: "Education", motion: "Colleges should use AI detectors to enforce academic integrity.", who: "Their point (against the motion)", point: "Detectors are useless and should be thrown out.",
+   opts: [["Detectors aren't proof, but useless goes too far. A 2026 study found newer detectors didn't show the old bias against non-native writers. Used as one clue alongside drafts and a conversation, a score can help a teacher decide what to ask about.", "strong"], ["Lots of colleges already pay for detectors, so they must work.", "bandwagon"], ["Without detectors, every degree will become worthless.", "slope"], ["Students who complain about detectors are probably cheating.", "personal"]] },
+ { s: "Education", motion: "Schools should give every student an AI tutor.", who: "Their point (for the motion)", point: "An AI tutor is available 24/7 and can explain things in many ways. It's like a personal tutor for everyone.",
+   opts: [["Being available isn't the same as helping students learn. A tutor that hands over answers lets students skip the thinking. The policy should require a guided mode, like ChatGPT's Study mode or Gemini's Guided Learning, that asks questions instead.", "strong"], ["I used a chatbot for math once and it was wrong, so AI tutors don't work.", "hasty"], ["Students are on their phones too much already.", "offtopic"], ["You want to replace every teacher with a chatbot.", "straw"]] },
+ { s: "Education", motion: "Schools should give every student an AI tutor.", who: "Their point (against the motion)", point: "AI in school just helps kids cheat. 59% of teens say AI cheating happens at their school at least somewhat often.",
+   opts: [["That number shows schools need clear rules, not a ban. The same Pew survey found 54% of teens already use chatbots for schoolwork, and only about half of schools have an AI policy. Teaching responsible use works better than pretending AI isn't there.", "strong"], ["Teens who answer surveys exaggerate everything.", "personal"], ["If schools ban AI, students will stop learning to type too.", "slope"], ["Everyone uses AI now, so cheating doesn't matter.", "bandwagon"]] },
+ { s: "Government", motion: "Government agencies should use AI to help decide who receives public benefits.", who: "Their point (for the motion)", point: "AI can process claims faster and catch fraud that people miss.",
+   opts: [["Speed hurts when the system is wrong. Michigan's MiDAS was wrong in about 85% of its fully automated fraud findings, and Australia's Robodebt wrongly issued about 470,000 debts. A person has to confirm before anyone loses benefits.", "strong"], ["Politicians who want this just want to cut programs.", "personal"], ["So you think fraud doesn't matter at all.", "straw"], ["Computers always make mistakes.", "unsupported"]] },
+ { s: "Government", motion: "Government agencies should use AI to help decide who receives public benefits.", who: "Their point (against the motion)", point: "Government shouldn't use AI at all. Look at Robodebt.",
+   opts: [["Robodebt shows what happens without human checks and legal review, not that every use fails. Federal agencies reported 3,611 AI uses in 2025, and many are low-risk, like summarizing documents. The answer is stricter rules for high-impact uses.", "strong"], ["Other countries use AI in government, so we should too.", "bandwagon"], ["Government websites are already hard to use.", "offtopic"], ["Without AI, government will collapse under its paperwork.", "slope"]] },
+ { s: "Government", motion: "Cities should use AI chatbots to answer residents' questions.", who: "Their point (for the motion)", point: "A chatbot lets residents get answers at midnight instead of waiting on hold.",
+   opts: [["A fast wrong answer is worse than a slow right one. NYC's MyCity chatbot told business owners they could take workers' tips, which is illegal, and the city took it down in February 2026. A city bot must answer only from official rules and link to them.", "strong"], ["The mayor who launched it was incompetent.", "personal"], ["You're saying residents should never be able to get help online.", "straw"], ["My friend got a wrong answer from a chatbot, so they're all broken.", "hasty"]] },
+ { s: "Government", motion: "Government agencies should allow AI to help write official reports.", who: "Their point (against the motion)", point: "AI invents citations, so it should never touch official reports. Deloitte's report for the Australian government had fake references.",
+   opts: [["The Deloitte case shows a checking failure: fake quotes and sources made it into an A$440,000 report. The fix is a rule that a person verifies every citation and AI use is disclosed, which the revised report finally did.", "strong"], ["Consultants are overpaid anyway.", "personal"], ["If we ban AI in reports, we'll have to ban word processors.", "slope"], ["Every office uses AI now.", "bandwagon"]] },
+];
+const SECTORS = ["Media", "Business", "Education", "Government"];
+const TIPS = {
+  Media: "In media rounds, the strongest answer usually separates labeling from checking. Ask: would this rebuttal still work if the AI story had a label but was wrong?",
+  Business: "In business rounds, look for the answer that weighs cost against quality and names who carries the risk: the customer, the applicant, or the company.",
+  Education: "In education rounds, the best rebuttals use the research on both sides: detectors can be biased, and newer ones may be less so. Avoid all-or-nothing answers.",
+  Government: "In government rounds, the strongest answers separate low-risk uses from high-impact decisions and insist a person checks before anyone loses benefits.",
+};
+const KEY = "pcp-best-v1";
+const $ = (id) => document.getElementById(id);
+let deck = [], i = 0, score = 0, answered = false, results = {}, traps = {};
+
+function shuffle(a) { a = a.slice(); for (let k = a.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [a[k], a[j]] = [a[j], a[k]]; } return a; }
+function readBest() { try { return Number(localStorage.getItem(KEY)) || 0; } catch (e) { return 0; } }
+function writeBest(v) { try { localStorage.setItem(KEY, String(v)); } catch (e) {} }
+function say(t) { $("live").textContent = ""; setTimeout(() => { $("live").textContent = t; }, 30); }
+function show(id) { ["start", "round", "results"].forEach((s) => ($(s).hidden = s !== id)); }
+
+function newGame() {
+  deck = shuffle(SECTORS.flatMap((s) => shuffle(BANK.filter((b) => b.s === s)).slice(0, 2)));
+  i = 0; score = 0; results = Object.fromEntries(SECTORS.map((s) => [s, [0, 0]])); traps = {};
+  render();
+}
+function render() {
+  const r = deck[i]; answered = false;
+  show("round");
+  $("r-count").textContent = `Round ${i + 1} of ${deck.length}`;
+  $("r-score").textContent = `Score ${score}`;
+  $("t-round").textContent = `Round ${i + 1}: ${r.s}`;
+  $("r-motion").textContent = "Motion: " + r.motion;
+  $("r-who").textContent = r.who;
+  $("r-point").textContent = "“" + r.point + "”";
+  r.order = shuffle(r.opts.map((o, k) => k));
+  $("r-opts").innerHTML = "";
+  r.order.forEach((k, n) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "slip"; b.dataset.k = k;
+    b.innerHTML = `<span class="k" aria-hidden="true">${n + 1}</span><span><span class="sr">Option ${n + 1}: </span>${r.opts[k][0]}</span>`;
+    b.addEventListener("click", () => choose(k));
+    li.appendChild(b); $("r-opts").appendChild(li);
+  });
+  $("fb").hidden = true;
+  $("t-round").focus();
+}
+function choose(k) {
+  if (answered) return; answered = true;
+  const r = deck[i], ok = r.opts[k][1] === "strong";
+  results[r.s][1]++; if (ok) { results[r.s][0]++; score++; } else { traps[r.opts[k][1]] = (traps[r.opts[k][1]] || 0) + 1; }
+  [...$("r-opts").querySelectorAll("button")].forEach((b) => {
+    const kk = Number(b.dataset.k), kind = r.opts[kk][1];
+    b.disabled = true;
+    const tag = document.createElement("span");
+    if (kind === "strong") { b.classList.add("right"); tag.className = "tag good"; tag.textContent = "✓ Strongest rebuttal" + (kk === k ? " (your pick)" : ""); }
+    else { if (kk === k) b.classList.add("wrong"); tag.className = "tag bad"; tag.textContent = "✗ " + FLAW[kind][0] + (kk === k ? " (your pick)" : ""); const w = document.createElement("span"); w.className = "why"; w.textContent = FLAW[kind][1]; b.lastElementChild.append(tag, w); return; }
+    b.lastElementChild.appendChild(tag);
+  });
+  $("r-score").textContent = `Score ${score}`;
+  $("t-fb").textContent = ok ? "✓ Correct: that's the strongest rebuttal" : `✗ Not quite: that one is a ${FLAW[r.opts[k][1]][0].toLowerCase()}`;
+  $("fb-text").textContent = ok ? "It answers the actual point, concedes what's true, and backs the response with a real case or number from this module." : FLAW[r.opts[k][1]][1] + " The strongest rebuttal is marked with ✓ above: it answers the point directly with real evidence.";
+  $("next").textContent = i === deck.length - 1 ? "See your ballot" : "Next round";
+  $("fb").hidden = false;
+  say(($("t-fb").textContent) + ". Score " + score + " of " + (i + 1) + ".");
+  $("t-fb").focus();
+}
+function next() { if (!answered) return; i++; if (i < deck.length) render(); else finish(); }
+function finish() {
+  show("results");
+  const best = Math.max(readBest(), score); writeBest(best);
+  $("res-score").textContent = `${score}/${deck.length}`;
+  $("res-best").textContent = `Best on this device: ${best}/${deck.length}`;
+  $("res-rows").innerHTML = SECTORS.map((s) => `<tr><th scope="row">${s}</th><td>${results[s][0]} of ${results[s][1]}</td></tr>`).join("");
+  const weakest = SECTORS.slice().sort((a, b) => results[a][0] / results[a][1] - results[b][0] / results[b][1])[0];
+  $("res-tip").textContent = score === deck.length ? "A perfect ballot. Try again: the rounds come from a bigger bank, so you'll see new motions." : `Weakest sector: ${weakest}. ${TIPS[weakest]}`;
+  const trap = Object.entries(traps).sort((a, b) => b[1] - a[1])[0];
+  $("res-trap").textContent = trap ? `The flaw that caught you most: ${FLAW[trap[0]][0]}. ${FLAW[trap[0]][1]}` : "No flaws caught you this time.";
+  say(`Debate over. You scored ${score} of ${deck.length}.`);
+  $("t-res").focus();
+}
+$("go").addEventListener("click", newGame);
+$("again").addEventListener("click", newGame);
+$("next").addEventListener("click", next);
+document.addEventListener("keydown", (e) => {
+  const tag = e.target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (tag === "BUTTON" && (e.key === "Enter" || e.key === " ")) return;
+  if ($("round").hidden) return;
+  if (!answered && /^[1-4]$/.test(e.key)) { const r = deck[i]; choose(r.order[Number(e.key) - 1]); e.preventDefault(); }
+  else if (answered && (e.key === "n" || e.key === "N")) { next(); e.preventDefault(); }
+});
+const b0 = readBest(); $("best-start").textContent = b0 ? `Best on this device: ${b0}/8` : "";
+</script>
+</body>
+</html>
